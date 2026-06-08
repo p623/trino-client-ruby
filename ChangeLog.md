@@ -1,5 +1,15 @@
 trino-client-ruby
 ====
+## 2.2.6
+- fix: improve POST retry tests and document idempotency assumption ([#159](https://github.com/treasure-data/trino-client-ruby/issues/159)) [[e64c2a9](https://github.com/treasure-data/trino-client-ruby/commit/e64c2a9)]
+- Add retry to POST /v1/statement ([#157](https://github.com/treasure-data/trino-client-ruby/issues/157)) [[64a5c66](https://github.com/treasure-data/trino-client-ruby/commit/64a5c66)]
+- Update psych requirement from ~> 3 to ~> 5 ([#140](https://github.com/treasure-data/trino-client-ruby/issues/140)) [[eeb3333](https://github.com/treasure-data/trino-client-ruby/commit/eeb3333)]
+- Update dependabot.yaml to change the update interval from weekly to monthly and set commit message prefix to "chore". [[2fde3f2](https://github.com/treasure-data/trino-client-ruby/commit/2fde3f2)]
+- Minor fix [[db03c07](https://github.com/treasure-data/trino-client-ruby/commit/db03c07)]
+- Update addressable requirement from ~> 2.8.1 to ~> 2.9.0 [[1a56064](https://github.com/treasure-data/trino-client-ruby/commit/1a56064)]
+- Update README.md for release instructions [skip ci] [[dda6a06](https://github.com/treasure-data/trino-client-ruby/commit/dda6a06)]
+- v2.2.5 [[12ce8e8](https://github.com/treasure-data/trino-client-ruby/commit/12ce8e8)]
+
 ## 2.2.5
 - Merge pull request [#155](https://github.com/treasure-data/trino-client-ruby/issues/155) from murakami-ta/add-http-debug-logger-option [[143a801](https://github.com/treasure-data/trino-client-ruby/commit/143a801)]
 - Fix http_debug_logger test to work with both Faraday 1 and 2 [[0976be7](https://github.com/treasure-data/trino-client-ruby/commit/0976be7)]
