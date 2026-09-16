@@ -33,7 +33,7 @@ module Trino::Client
       new StatementClient.new(faraday, nil, options, next_uri)
     end
 
-    def self.kill(query_id, faraday, options)
+    def self.kill(query_id, faraday)
       response = faraday.delete do |req|
         req.url "/v1/query/#{query_id}"
       end

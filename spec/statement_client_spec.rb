@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'faraday/adapter/test'
 
 describe Trino::Client::StatementClient do
   let :options do
@@ -442,7 +443,7 @@ describe Trino::Client::StatementClient do
 
     it "forbids using basic auth when ssl is disabled" do
       expect do
-        Query.__send__(:faraday_client, {
+        Trino::Client.faraday_client({
           server: 'localhost',
           password: 'abcd'
         })
@@ -488,16 +489,38 @@ describe Trino::Client::StatementClient do
     end
   end
 
+  describe "faraday adapter" do
+    it "uses the adapter specified in the options" do
+      connection = Trino::Client.faraday_client(
+        server: "localhost",
+        faraday_adapter: :test
+      )
+
+      expect(connection.adapter).to eq(Faraday::Adapter::Test)
+    end
+
+    it "uses the default adapter when no adapter is specified" do
+      connection = Trino::Client.faraday_client(
+        server: "localhost"
+      )
+
+      expected_adapter =
+        Faraday::Adapter.lookup_middleware(Faraday.default_adapter)
+
+      expect(connection.adapter).to eq(expected_adapter)
+    end
+  end
+
   describe "ssl" do
     it "is disabled by default" do
-      f = Query.__send__(:faraday_client, {
+      f = Trino::Client.faraday_client({
         server: "localhost",
       })
       expect(f.url_prefix.to_s).to eq "http://localhost/"
     end
 
     it "is enabled with ssl: true" do
-      f = Query.__send__(:faraday_client, {
+      f = Trino::Client.faraday_client({
         server: "localhost",
         ssl: true,
       })
@@ -506,7 +529,7 @@ describe Trino::Client::StatementClient do
     end
 
     it "is enabled with ssl: {verify: false}" do
-      f = Query.__send__(:faraday_client, {
+      f = Trino::Client.faraday_client({
         server: "localhost",
         ssl: {verify: false}
       })
@@ -516,7 +539,7 @@ describe Trino::Client::StatementClient do
 
     it "rejects invalid ssl: verify: object" do
       expect do
-        f = Query.__send__(:faraday_client, {
+        f = Trino::Client.faraday_client({
           server: "localhost",
           ssl: {verify: "??"}
         })
@@ -534,7 +557,7 @@ describe Trino::Client::StatementClient do
         client_key: OpenSSL::PKey::DSA.new,
       }
 
-      f = Query.__send__(:faraday_client, {
+      f = Trino::Client.faraday_client({
         server: "localhost",
         ssl: ssl,
       })
@@ -550,7 +573,7 @@ describe Trino::Client::StatementClient do
 
     it "rejects an invalid string" do
       expect do
-        Query.__send__(:faraday_client, {
+        Trino::Client.faraday_client({
           server: "localhost",
           ssl: '??',
         })
@@ -559,7 +582,7 @@ describe Trino::Client::StatementClient do
 
     it "rejects an integer" do
       expect do
-        Query.__send__(:faraday_client, {
+        Trino::Client.faraday_client({
           server: "localhost",
           ssl: 3,
         })
