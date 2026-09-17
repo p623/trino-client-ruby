@@ -118,7 +118,7 @@ $ bundle exec rake modelgen:latest
 * **http_timeout** sets timeout in seconds to read data from a server.
 * **gzip** enables gzip compression.
 * **follow_redirect** enables HTTP redirection support.
-* **faraday_adapter** sets the Faraday adapter to use. Default is `Faraday.default_adapter`. To reuse persistent HTTP connections, install` faraday-net_http_persistent` and specify `:net_http_persistent`.
+* **faraday_adapter** sets the Faraday adapter to use. Default is `Faraday.default_adapter`. To reuse persistent HTTP connections, install `faraday-net_http_persistent` and specify `:net_http_persistent`.
 * **model_version** set the Trino version to which a job is submitted. Supported versions are 351, 316, 303, 0.205, 0.178, 0.173, 0.153 and 0.149. Default is 351.
 
 See [RDoc](http://www.rubydoc.info/gems/presto-client/) for the full documentation.
