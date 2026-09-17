@@ -87,7 +87,7 @@ describe Trino::Client::Client do
 
       expect(Trino::Client::Query)
         .to receive(:kill)
-              .with("query-id", faraday)
+              .with("query-id", faraday, options)
               .and_return(true)
 
       expect(client.kill("query-id")).to eq(true)

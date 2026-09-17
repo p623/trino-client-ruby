@@ -163,6 +163,95 @@ describe Trino::Client::StatementClient do
     end
   end
 
+  describe "Faraday client reuse" do
+    it "builds headers from the current options for each query" do
+      connection = Trino::Client.faraday_client(options)
+
+      first_request = stub_request(
+        :post,
+        "http://localhost/v1/statement"
+      ).with(
+        body: query,
+        headers: {
+          "X-Trino-Catalog" => "native"
+        }
+      ).to_return(
+        body: response_json.to_json
+      )
+
+      described_class.new(connection, query, options)
+
+      options[:catalog] = "updated-catalog"
+
+      second_request = stub_request(
+        :post,
+        "http://localhost/v1/statement"
+      ).with(
+        body: query,
+        headers: {
+          "X-Trino-Catalog" => "updated-catalog"
+        }
+      ).to_return(
+        body: response_json.to_json
+      )
+
+      described_class.new(connection, query, options)
+
+      expect(first_request).to have_been_requested.once
+      expect(second_request).to have_been_requested.once
+    end
+
+    it "uses the same headers for all requests in a query" do
+      connection = Trino::Client.faraday_client(options)
+
+      query_options = options.merge(
+        catalog: "query-catalog"
+      )
+
+      first_response = {
+        id: "queryid",
+        nextUri: "http://localhost/v1/next_uri",
+        stats: {}
+      }
+
+      post_request = stub_request(
+        :post,
+        "http://localhost/v1/statement"
+      ).with(
+        body: query,
+        headers: {
+          "X-Trino-Catalog" => "query-catalog"
+        }
+      ).to_return(
+        body: first_response.to_json
+      )
+
+      get_request = stub_request(
+        :get,
+        "http://localhost/v1/next_uri"
+      ).with(
+        headers: {
+          "X-Trino-Catalog" => "query-catalog"
+        }
+      ).to_return(
+        body: response_json.to_json
+      )
+
+      statement_client = described_class.new(
+        connection,
+        query,
+        query_options
+      )
+
+      query_options[:catalog] = "changed-during-query"
+
+      statement_client.advance
+
+      expect(post_request).to have_been_requested.once
+      expect(get_request).to have_been_requested.once
+    end
+  end
+
   describe "POST /v1/statement retry" do
     let :headers do
       {

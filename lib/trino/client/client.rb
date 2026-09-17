@@ -42,7 +42,7 @@ module Trino::Client
     end
 
     def kill(query_id)
-      return Query.kill(query_id, @faraday)
+      return Query.kill(query_id, @faraday, @options)
     end
 
     def run(query)

@@ -48,7 +48,8 @@ describe Trino::Client::Query do
 
   describe ".kill" do
     it "uses the provided Faraday client to delete the query" do
-      request = double("request")
+      request_headers = {}
+      request = double("request", headers: request_headers)
       response = instance_double(Faraday::Response, status: 204)
 
       expect(faraday)
@@ -60,13 +61,16 @@ describe Trino::Client::Query do
         .to receive(:url)
               .with("/v1/query/query-id")
 
-      result = described_class.kill("query-id", faraday)
+      result = described_class.kill("query-id", faraday, options)
 
+      expect(request_headers).to include(
+        "X-Trino-User" => "test-user"
+      )
       expect(result).to eq(true)
     end
 
     it "returns false when deleting the query fails" do
-      request = double("request")
+      request = double("request", headers: {})
       response = instance_double(Faraday::Response, status: 500)
 
       allow(request)
@@ -78,7 +82,7 @@ describe Trino::Client::Query do
               .and_yield(request)
               .and_return(response)
 
-      result = described_class.kill("query-id", faraday)
+      result = described_class.kill("query-id", faraday, options)
 
       expect(result).to eq(false)
     end
