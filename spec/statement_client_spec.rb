@@ -164,6 +164,39 @@ describe Trino::Client::StatementClient do
   end
 
   describe "Faraday client reuse" do
+    it "sends the Basic authorization header with each query" do
+      auth_options = options.merge(
+        ssl: true,
+        user: "test-user",
+        password: "secret"
+      )
+
+      connection = Trino::Client.faraday_client(auth_options)
+
+      authorization =
+        "Basic #{Base64.strict_encode64("test-user:secret")}"
+
+      request = stub_request(
+        :post,
+        "https://localhost/v1/statement"
+      ).with(
+        body: query,
+        headers: {
+          "Authorization" => authorization
+        }
+      ).to_return(
+        body: response_json.to_json
+      )
+
+      described_class.new(
+        connection,
+        query,
+        auth_options
+      )
+
+      expect(request).to have_been_requested.once
+    end
+
     it "builds headers from the current options for each query" do
       connection = Trino::Client.faraday_client(options)
 
